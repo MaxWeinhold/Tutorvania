@@ -20,6 +20,8 @@ public class PlayerScript : MonoBehaviour
 	bool jumped;
 	
 	Rigidbody2D rb;
+	Animator playerAnimator;
+	SpriteRenderer SR;
 	
 	//OnMove checks if controlls for the movement are pressed
 	public void OnMove(InputAction.CallbackContext context){
@@ -40,7 +42,11 @@ public class PlayerScript : MonoBehaviour
 			rb.AddForce(transform.up*thrust*100);
 			//Player is now in the air, therefore he cant jump anymore. Set this true again, if player hits the floor.
     		grounded=false;
+    		
+        	playerAnimator.SetTrigger("Jumping");
 		}
+		
+		
     }
 	
 	//Move is the class that includes running mechanics
@@ -48,18 +54,32 @@ public class PlayerScript : MonoBehaviour
     {
 		//Add force to the players rigidbody in the direction, of the input in movementInput.x
 		rb.velocity = new Vector2 ( movementInput.x*speed, rb.velocity.y );
+		if(Mathf.Abs(movementInput.x)>0.01f){
+			playerAnimator.SetBool("Running",true);
+		}
+		else{
+			playerAnimator.SetBool("Running",false);
+		}
+		
+		if(movementInput.x>0.01f){SR.flipX = false;}
+		if(movementInput.x<-0.01f){SR.flipX = true;}
     }
 	
     // Start is called before the first frame update
     void Start()
     {
     	//Get the rigidbody attached to the player
-        rb = GetComponent<Rigidbody2D> ();
+        rb = GetComponent<Rigidbody2D>();
+        playerAnimator = GetComponent<Animator>();
+        SR =  GetComponent<SpriteRenderer>();
     }
 
     // Update is called permanently
     void FixedUpdate()
     {
+    	playerAnimator.SetBool("Grounded",grounded);
+    	playerAnimator.SetFloat("Velocity",rb.velocity.y);
+    	
     	//Create another class for jumping to organize the code
     	Jump();
     	Move();
