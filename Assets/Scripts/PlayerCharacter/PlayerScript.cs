@@ -43,6 +43,7 @@ public class PlayerScript : MonoBehaviour
 			//Player is now in the air, therefore he cant jump anymore. Set this true again, if player hits the floor.
     		grounded=false;
     		
+    		//Give playerAnimator Instructions
         	playerAnimator.SetTrigger("Jumping");
 		}
 		
@@ -54,6 +55,7 @@ public class PlayerScript : MonoBehaviour
     {
 		//Add force to the players rigidbody in the direction, of the input in movementInput.x
 		rb.velocity = new Vector2 ( movementInput.x*speed, rb.velocity.y );
+		//Give playerAnimator Instructions
 		if(Mathf.Abs(movementInput.x)>0.01f){
 			playerAnimator.SetBool("Running",true);
 		}
@@ -61,6 +63,7 @@ public class PlayerScript : MonoBehaviour
 			playerAnimator.SetBool("Running",false);
 		}
 		
+		//Flip the sprite so the player runs never backwards
 		if(movementInput.x>0.01f){SR.flipX = false;}
 		if(movementInput.x<-0.01f){SR.flipX = true;}
     }
@@ -77,12 +80,17 @@ public class PlayerScript : MonoBehaviour
     // Update is called permanently
     void FixedUpdate()
     {
+    	//Give playerAnimator Instructions
     	playerAnimator.SetBool("Grounded",grounded);
     	playerAnimator.SetFloat("Velocity",rb.velocity.y);
     	
+    	int map_mactive = PlayerPrefs.GetInt("map_active");
+    	
     	//Create another class for jumping to organize the code
-    	Jump();
-    	Move();
+    	if(map_mactive==0){
+    		Jump();
+    		Move();
+    	}
     }
     
     // OnCollisionEnter2D is called when the object collides with an collider of another object
