@@ -75,6 +75,8 @@ public class PlayerScript : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         playerAnimator = GetComponent<Animator>();
         SR =  GetComponent<SpriteRenderer>();
+        
+        PlayerPrefs.SetInt("map_active",0);
     }
 
     // Update is called permanently
