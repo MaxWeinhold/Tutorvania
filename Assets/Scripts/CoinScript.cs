@@ -23,6 +23,7 @@ public class CoinScript : MonoBehaviour
 	
 		if(other.tag=="Player"){
     		
+    		GetComponent<AudioSource>().Play();
     		coins = PlayerPrefs.GetInt("Coins");
     		coins++;
     		PlayerPrefs.SetInt("Coins",coins);
