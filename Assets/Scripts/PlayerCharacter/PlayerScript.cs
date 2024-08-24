@@ -39,6 +39,11 @@ public class PlayerScript : MonoBehaviour
 		//If jump is pressed and the player is on the ground, execute jumping
 		if(jumped && grounded){
 			//This will add a force to the players rigidbody, so the player will jump
+			
+			//Reset velovity to gain always the same jump height!
+			rb.velocity = Vector2.zero;
+			
+			//add force for jump
 			rb.AddForce(transform.up*thrust*100);
 			//Player is now in the air, therefore he cant jump anymore. Set this true again, if player hits the floor.
     		grounded=false;
@@ -95,14 +100,11 @@ public class PlayerScript : MonoBehaviour
     	}
     }
     
-    // OnCollisionEnter2D is called when the object collides with an collider of another object
-    void OnCollisionEnter2D(Collision2D col){
-    	
-    	//checks wethere the collision is made with the floor
-    	if(col.gameObject.tag=="Floor"){
-    		
+    // OnCollisionEnter2D is called when the object collides with an collider of another objectd
+    void OnTriggerStay2D(Collider2D other){
+    	if(other.tag=="Floor"){
     		//This bool will make jumping possible if true
     		grounded=true;
-    	}
+		}
     }
 }
