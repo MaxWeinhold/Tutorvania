@@ -18,7 +18,13 @@ public class PlayerScript : MonoBehaviour
 	[SerializeField] float thrust = 300;
 	[SerializeField] bool grounded = true;
 	bool jumped;
+	bool attackGP;
 	
+	[Header("Attacking")]
+	[SerializeField] GameObject Attack1_HB;
+	bool attack_active;
+	bool attack_pressed = false;
+
 	Rigidbody2D rb;
 	Animator playerAnimator;
 	SpriteRenderer SR;
@@ -31,6 +37,10 @@ public class PlayerScript : MonoBehaviour
 	//OnJump checks if controlls for the jumping are pressed
     public void OnJump(InputAction.CallbackContext context){
     	jumped = context.action.triggered;
+    }
+	
+    public void OnAttack(InputAction.CallbackContext context){
+    	attackGP = context.action.triggered;
     }
 	
 	//Jump is the class that includes jumping mechanics
@@ -69,9 +79,31 @@ public class PlayerScript : MonoBehaviour
 		}
 		
 		//Flip the sprite so the player runs never backwards
-		if(movementInput.x>0.01f){SR.flipX = false;}
-		if(movementInput.x<-0.01f){SR.flipX = true;}
+		if(movementInput.x>0.01f  && !facingRight){
+			
+            transform.Rotate(0, 180, 0);
+            facingRight = true;
+		}
+		if(movementInput.x<-0.01f && facingRight){
+			
+            transform.Rotate(0, 180, 0);
+            facingRight = false;
+		}
     }
+	
+	void Attack1()
+	{
+		if(attackGP){
+    		if(!attack_pressed && !attack_active){
+    			attack_pressed=true;
+    			playerAnimator.SetTrigger("AttackTrigger");
+    			attack_active=true;
+    		}
+    	}
+    	else{attack_pressed=false;}
+	
+	}
+	
 	
     // Start is called before the first frame update
     void Start()
@@ -97,6 +129,16 @@ public class PlayerScript : MonoBehaviour
     	if(map_mactive==0){
     		Jump();
     		Move();
+    		Attack1();
+    		
+    		if (playerAnimator.GetCurrentAnimatorStateInfo(0).IsName("Player_Attack1")){
+			    attack_active=true;
+			    Attack1_HB.SetActive(true);
+    		}else{
+    			attack_active=false;
+			    Attack1_HB.SetActive(false);
+    		}
+  
     	}
     }
     
