@@ -7,6 +7,8 @@ TagManager:
   - Floor
   - New tag
   - Player_Attack
+  - Enemy_Attack
+  - InstantDeath
   layers:
   - Default
   - TransparentFX
