@@ -36,6 +36,16 @@ public class SkeletonBehavior : MonoBehaviour
 	[SerializeField] [Range(5, 25)] float hurt_thrust;
 	float short_term_thrust;
 	
+	[Header("Attacks")]
+	[SerializeField] [Range(0, 5)]  float attack_range=1;
+	[SerializeField] [Range(0, 5)]  float attack_delay=1;
+	[SerializeField] [Range(0, 10)]  float attack_cooldown=1;
+	float attack_duration;
+	float cooldown;
+	[SerializeField] GameObject AttackBox;
+	float player_distance;
+	[SerializeField] bool ready_to_attack=true;
+	bool ask_for_frame = false;
 	
     // Start is called before the first frame update
     void Start()
@@ -48,7 +58,45 @@ public class SkeletonBehavior : MonoBehaviour
         actual_lifes = lifes;
     }
 
+    // Function for managing enemy attacks
+    void Attack()
+    {
+    	AnimatorStateInfo stateInfo = Enemy.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0);
     
+	    if (stateInfo.IsName("AttackAnimation")) {
+			float animationProgress = stateInfo.normalizedTime % 1;
+		        
+		    if (animationProgress > 0.5f && animationProgress < 0.6f) { // Checks the animation progress
+		    	AttackBox.SetActive(true); // Activate the attack box
+		    } else {
+		    	AttackBox.SetActive(false); // Deactivate the attack box
+		    }
+	   	}
+    	
+    	//count down the attack_duration
+    	if(attack_duration>0){
+    		attack_duration = attack_duration - Time.deltaTime;
+    	}
+    	else{AttackBox.SetActive(false);}
+    	
+    	//countdown cooldown for setting ready_to_attack to true, so the enemy can attack again
+    	if(cooldown>0 && attack_duration<0){
+    		cooldown = cooldown - Time.deltaTime;
+    	}
+    	else if(cooldown<=0){ready_to_attack=true;}
+    	
+    	player_distance =  Mathf.Abs( player.transform.position.x - Enemy.transform.position.x );
+    	
+    	//If player is close enough, he is within the attack range!
+	    if(attack_range > player_distance && ready_to_attack){
+    		Enemy.GetComponent<Animator>().SetTrigger("Attack");
+	    	attack_duration = attack_delay;
+	    	cooldown = attack_cooldown;
+    		ready_to_attack=false;
+    	}
+    }
+
+    // Function for managing player attacks
     void Hurt(){
     	
    		if(EH.hurted){
@@ -83,7 +131,11 @@ public class SkeletonBehavior : MonoBehaviour
     void FixedUpdate()
     {
 
+    	AttackBox.transform.position = Enemy.transform.position;
+    	
     	if(!dead){
+    		
+    		Attack();
     		Hurt();
     		
     		if(player.transform.position.x>Detection_Edge1.transform.position.x && player.transform.position.x < Detection_Edge2.transform.position.x){
