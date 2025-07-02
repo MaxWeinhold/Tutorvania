@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class PlayerScript : MonoBehaviour
 {	
@@ -36,7 +37,16 @@ public class PlayerScript : MonoBehaviour
 	public bool dead = false;
 	[SerializeField] [Range(10, 50)] float hurt_thrust;
 	float short_term_thrust;
-
+	
+	[Header("GameOver")]
+	[SerializeField] GameObject GameOverBackground;
+	[SerializeField] GameObject GameOverText;
+	[SerializeField] GameObject GameOverButton1;
+	[SerializeField] GameObject GameOverButton1Text;
+	[SerializeField] GameObject GameOverButton2;
+	[SerializeField] GameObject GameOverButton2Text;
+	float transparency = 0;
+		
 	Rigidbody2D rb;
 	Animator playerAnimator;
 	SpriteRenderer SR;
@@ -158,14 +168,37 @@ public class PlayerScript : MonoBehaviour
         playerAnimator = GetComponent<Animator>();
         SR =  GetComponent<SpriteRenderer>();
         
+		GameOverBackground.SetActive(false);
+		GameOverText.SetActive(false);
+        
         actual_lifes = lifes;
         
         PlayerPrefs.SetInt("map_active",0);
     }
-
+    
     // Update is called permanently
     void FixedUpdate()
     {
+    	
+    	if(dead){
+    		
+			GameOverBackground.SetActive(true);
+			GameOverText.SetActive(true);
+			
+			if(transparency<1){transparency += 0.01f;}else{transparency=1;}
+			Color blackColor = new Color(0, 0, 0, transparency);
+			Color whiteColor = new Color(1, 1, 1, transparency);
+			
+			GameOverBackground.GetComponent<Image>().color = blackColor;
+    		GameOverText.GetComponent<Text>().color = whiteColor;
+    		
+			GameOverButton1.GetComponent<Image>().color = whiteColor;
+			GameOverButton1Text.GetComponent<Text>().color = whiteColor;
+			GameOverButton2.GetComponent<Image>().color = whiteColor;
+			GameOverButton2Text.GetComponent<Text>().color = whiteColor;
+    	
+    	}
+    	
     	if(short_term_thrust!=0){short_term_thrust*=0.8f;}
     	//Give playerAnimator Instructions
     	playerAnimator.SetBool("Grounded",grounded);
